@@ -1,11 +1,13 @@
-import { bootstrap } from '@vendure/core';
-import { config } from './vendure-config';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import fs from 'fs';
+import path from 'path';
 
-bootstrap(config).then(app => {
-  const expressApp = app as NestExpressApplication;
+// Ensure vendure-ui-config.json is copied before Vendure looks for it
+const src = path.join(__dirname, '../admin-ui/src/vendure-ui-config.json');
+const dest = path.join(__dirname, '../admin-ui/dist/vendure-ui-config.json');
 
-  expressApp.set('trust proxy', 1); // 🔐 Fixes Coolify X-Forwarded-For error
-
-  console.log('🚀 Vendure started with trust proxy enabled');
-});
+if (fs.existsSync(src)) {
+  fs.copyFileSync(src, dest);
+  console.log('✅ vendure-ui-config.json copied to admin-ui/dist');
+} else {
+  console.warn('⚠️  vendure-ui-config.json not found in src!');
+}

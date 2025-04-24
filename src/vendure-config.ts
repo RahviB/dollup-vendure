@@ -70,13 +70,15 @@ plugins: [
     assetUploadDir: path.join(__dirname, '../static/assets'),
     assetUrlPrefix: IS_DEV ? undefined : 'https://admin.dollupboutique.com/assets/',
   }),
-
 AdminUiPlugin.init({
   route: 'admin',
   port: serverPort + 2,
   app: compileUiExtensions({
     outputPath: path.join(__dirname, '../admin-ui'),
-    extensions: [], // Add your custom extensions here if needed
+    extensions: [],
+
+    // ✅ Add this to force UI build even with no extensions
+    devMode: false,
   }),
   adminUiConfig: {
     apiHost: process.env.API_HOST || 'admin.dollupboutique.com',
