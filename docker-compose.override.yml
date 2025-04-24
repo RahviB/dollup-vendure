@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: dollup-vendure
+    depends_on:
+      - vendure-db
+    environment:
+      DB_HOST: vendure-db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: vendure123
+      DB_NAME: postgres
+      DB_SCHEMA: public
+      SSL_MODE: require
+    networks:
+      - vendure-net
+
+  vendure-db:
+    image: postgres:16-alpine
+    container_name: vendure-db
+    ports:
+      - "5543:5432"  # External:Internal
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: vendure123
+    networks:
+      - vendure-net
+
+networks:
+  vendure-net:
