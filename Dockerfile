@@ -2,14 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Install all dependencies including devDependencies (required for @vendure/ui-devkit)
 COPY package*.json ./
-RUN npm install --production
+RUN npm install
 
 # Copy source code
 COPY . .
 
-# Build the project
+# Build the project (compiles TS and admin-ui)
 RUN npm run build
 
 # Expose default port
