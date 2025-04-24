@@ -76,10 +76,11 @@ AdminUiPlugin.init({
   port: serverPort + 2,
   app: compileUiExtensions({
     outputPath: path.join(__dirname, '../admin-ui'),
-    extensions: [],
+    extensions: [], // Add your custom extensions here if needed
   }),
   adminUiConfig: {
-    apiPort: serverPort,
+    apiHost: process.env.API_HOST || 'admin.dollupboutique.com',
+    apiPort: process.env.API_PORT ? parseInt(process.env.API_PORT, 10) : 443,
   },
 }),
 
