@@ -14,11 +14,10 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
-     apiOptions: {
+apiOptions: {
         port: serverPort,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        assetUrlPrefix: 'assets', // make sure assets load properly
         ...(IS_DEV ? {
             adminApiPlayground: {
                 settings: { 'request.credentials': 'include' },
@@ -29,6 +28,9 @@ export const config: VendureConfig = {
             },
             shopApiDebug: true,
         } : {}),
+    },
+    assetOptions: {
+        assetUrlPrefix: 'assets',
     },
     adminUiOptions: {
         adminUiConfig: {
