@@ -14,13 +14,11 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
-    apiOptions: {
+     apiOptions: {
         port: serverPort,
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        // The following options are useful in development mode,
-        // but are best turned off for production for security
-        // reasons.
+        assetUrlPrefix: 'assets', // make sure assets load properly
         ...(IS_DEV ? {
             adminApiPlayground: {
                 settings: { 'request.credentials': 'include' },
@@ -32,6 +30,12 @@ export const config: VendureConfig = {
             shopApiDebug: true,
         } : {}),
     },
+    adminUiOptions: {
+        adminUiConfig: {
+            apiHost: process.env.API_HOST,
+            apiPort: process.env.API_PORT,
+        },
+    },
     authOptions: {
         tokenMethod: ['bearer', 'cookie'],
         superadminCredentials: {
@@ -39,7 +43,7 @@ export const config: VendureConfig = {
             password: process.env.SUPERADMIN_PASSWORD,
         },
         cookieOptions: {
-          secret: process.env.SESSION_SECRET,
+            secret: process.env.SESSION_SECRET,
         },
     },
     dbConnectionOptions: {
