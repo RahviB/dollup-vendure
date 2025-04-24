@@ -7,8 +7,9 @@ import {
 import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
+import { compileUiExtensions } from '@vendure/ui-devkit/compiler';
 import 'dotenv/config';
-import path from 'path';
+import * as path from 'path';
 
 const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
@@ -29,15 +30,7 @@ apiOptions: {
             shopApiDebug: true,
         } : {}),
     },
-    assetOptions: {
-        assetUrlPrefix: 'assets',
-    },
-    adminUiOptions: {
-        adminUiConfig: {
-            apiHost: process.env.API_HOST,
-            apiPort: process.env.API_PORT,
-        },
-    },
+
     authOptions: {
         tokenMethod: ['bearer', 'cookie'],
         superadminCredentials: {
@@ -71,38 +64,48 @@ apiOptions: {
     // When adding or altering custom field definitions, the database will
     // need to be updated. See the "Migrations" section in README.md.
     customFields: {},
-    plugins: [
-        AssetServerPlugin.init({
-            route: 'assets',
-            assetUploadDir: path.join(__dirname, '../static/assets'),
-            // For local dev, the correct value for assetUrlPrefix should
-            // be guessed correctly, but for production it will usually need
-            // to be set manually to match your production url.
-            assetUrlPrefix: IS_DEV ? undefined : 'https://www.my-shop.com/assets/',
-        }),
-        DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
-        DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
-        EmailPlugin.init({
-            devMode: true,
-            outputPath: path.join(__dirname, '../static/email/test-emails'),
-            route: 'mailbox',
-            handlers: defaultEmailHandlers,
-            templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
-            globalTemplateVars: {
-                // The following variables will change depending on your storefront implementation.
-                // Here we are assuming a storefront running at http://localhost:8080.
-                fromAddress: '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: 'http://localhost:8080/verify',
-                passwordResetUrl: 'http://localhost:8080/password-reset',
-                changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
-            },
-        }),
-        AdminUiPlugin.init({
-            route: 'admin',
-            port: serverPort + 2,
-            adminUiConfig: {
-                apiPort: serverPort,
-            },
-        }),
-    ],
+plugins: [
+  AssetServerPlugin.init({
+    route: 'assets',
+    assetUploadDir: path.join(__dirname, '../static/assets'),
+    assetUrlPrefix: IS_DEV ? undefined : 'https://admin.dollupboutique.com/assets/',
+  }),
+
+AdminUiPlugin.init({
+  route: 'admin',
+  port: serverPort + 2,
+  app: compileUiExtensions({
+    outputPath: path.join(__dirname, '../admin-ui'),
+    extensions: [],
+  }),
+  adminUiConfig: {
+    apiPort: serverPort,
+  },
+}),
+
+  DefaultJobQueuePlugin.init({
+    useDatabaseForBuffer: true,
+  }),
+
+  DefaultSearchPlugin.init({
+    bufferUpdates: false,
+    indexStockStatus: true,
+  }),
+
+  EmailPlugin.init({
+    devMode: true,
+    outputPath: path.join(__dirname, '../static/email/test-emails'),
+    route: 'mailbox',
+    handlers: defaultEmailHandlers,
+    templateLoader: new FileBasedTemplateLoader(
+      path.join(__dirname, '../static/email/templates')
+    ),
+    globalTemplateVars: {
+      fromAddress: `"Example" <noreply@example.com>`,
+      verifyEmailAddressUrl: 'http://localhost:8080/verify',
+      passwordResetUrl: 'http://localhost:8080/password-reset',
+      changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change',
+    },
+  }),
+],
 };
