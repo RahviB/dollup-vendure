@@ -39,7 +39,7 @@ export const config: VendureConfig = {
             password: process.env.SUPERADMIN_PASSWORD,
         },
         cookieOptions: {
-          secret: process.env.COOKIE_SECRET,
+          secret: process.env.SESSION_SECRET,
         },
     },
     dbConnectionOptions: {
